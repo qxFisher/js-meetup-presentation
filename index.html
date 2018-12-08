@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-background="#f3df49">
+					<h1>JS Promises</h1>
+					<p>by Lesnik Matvey</p>
+				</section>
+				<section>
+					<h2>What is a Promise?</h2>
+					<ul>
+						<li>A promise is an object that represents the return value or the thrown exception that the function may eventually provide.</li>
+						<li>A promise is an asynchronous value.</li>
+						<li>Promises are one way to deal with asynchronous code, without writing too many callbacks in your code.</li>
+					</ul>
+				</section>
+				<section>
+						<section>
+							<h2>How promises work</h2>
+							<pre><code data-trim data-noescape>
+									let promise = new Promise(function(resolve, reject) {
+										// executor
+									});</code></pre>
+						</section>
+						<section>
+							<h3>A promise can be:</h3>
+							<ul>
+								<li>fulfilled - The action relating to the promise succeeded</li>
+								<li>rejected - The action relating to the promise failed</li>
+								<li>pending - Hasn't fulfilled or rejected yet</li>
+							</ul>
+							<img src="./img/promise-states.png" alt="promise-states">
+						</section>
+						<section>
+							<h6>Example of a Promise constructor and a simple executor </h6>
+								<div><pre><code data-trim data-noescape>
+										let promise = new Promise(function(resolve, reject) {
+										// the function is executed automatically when the promise is 
+										// constructed
+										  
+										// after 1 second signal that the job is done with the result "done!"
+											setTimeout(() => resolve("done!"), 1000);
+										  });</code></pre>
+							<ol style="font-size: 0.7em !important;">
+								<li class="fragment fade-in">The executor is called automatically and immediately (by the new Promise).</li>
+								<li class="fragment fade-in">The executor receives two arguments: resolve and reject — these functions are
+									pre-defined by the JavaScript engine. So we don’t need to create them. Instead, we should write the executor to call them when ready.</li>
+							</ol>
+							<img class="fragment fade-in" src="./img/promise-resolve-1.png" alt="promise-resolve-1">
+						</div>
+						</section>
+						<section>
+							<h4>There can be only a single result or an error</h4>
+
+							<pre><code data-trim data-noescape>
+									let promise = new Promise(function(resolve, reject) {
+										resolve("done");
+									  
+										reject(new Error("…")); // ignored
+										setTimeout(() => resolve("…")); // ignored
+									  });</code></pre>
+							<p> <span style="color: rgb(95, 153, 95);">resolve</span>/<span style="color: rgb(231, 93, 93);">reject</span> expect only <b>one</b> argument and will ignore additional arguments.</p>
+						</section>
+						<section>
+							<h3>Promise methods:</h3>
+							<ul>
+								<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all">Promise.all(iterable)</a></li>
+								<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race">Promise.race(iterable)</a></li>
+								<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject">Promise.reject(reason)</a></li>
+								<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve">Promise.resolve(value)</a></li>
+							</ul>
+						</section>
+				</section>
+				<section>
+					<section>
+						<h2>Image onload promise</h2>
+						<pre><code data-trim data-noescape>
+								new Promise(function(resolve, reject) {
+									var img = document.createE1ement('img');
+									img.src = 'image.jpg';
+									img.onload = resolve;
+									img.onerror = reject;
+									document.body.appendChild(img);
+								})
+								.then(finishLoading)
+								.catch(showAlternateImage);</code></pre>
+						<div class="fragment fade-in" data-fragment-index="0">
+							<span style="font-weight:bold; color: #f3df49;">Note</span> <span>The JavaScript engine does not immediately stop executing this function upon calling resolved</span>
+						</div>
+					</section>
+					<section>
+						<pre><code data-trim data-noescape>
+								new Promise(function(resolve[, reject]) {
+									var value = doSomething():
+									if (thingWorked) {
+										resolve(value);
+									} else if (somethingWentWrong) {
+										reject(); // No argument
+									}).then(function(value) {
+										// success!
+										return nextThing(value);
+									}).catch(rejectFunction);
+										//receives undefined</code></pre>
+						<div class="fragment fade-in" data-fragment-index="0">
+							<span style="font-weight:bold; color: #f3df49;">If a Promise is passed, the Promise executes first!</span>
+						</div>
+					</section>
+				</section>
+				<section>
+					<section>
+							<h4>Promises chaining</h4>
+							<img src="./img/chaining.png" alt="" style="position: absolute; z-index: 1; right: 50px;">
+							<pre><code data-trim data-noescape>
+									new Promise(function(resolve, reject) {
+										setTimeout(() => resolve(1), 1000); // (*)
+									  }).then(function(result) { // (**)
+										alert(result); // 1
+										return result * 2;
+									  }).then(function(result) { // (***)
+										alert(result); // 2
+										return result * 2;
+									  }).then(function(result) {
+										alert(result); // 4
+										return result * 2;
+									  });
+							</code></pre>
+							<p> <span style="color: #f3df49;">then()</span> isn't the end of the story, you can chain .thens together to transform values or run additional async actions one after another.</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Error Handling</h2>
+						<img src="https://media.giphy.com/media/xT9IgH6tFP7dNVrQAw/source.gif" alt="Error Gif">
+					</section>
+					<section>
+						<h3>Error :C</h3>
+						<pre><code data-trim data-noescape>
+								fetch('https://no-such-server.blabla') // rejects
+									.then(response => response.json())
+									.catch(err => alert(err)) 
+									// TypeError: failed to fetch (the text may vary)
+						</code></pre>
+							<ul>
+						  	  <li class="fragment fade-in"><span style="color: rgb(95, 153, 95);">Resolve</span> and <span style="color: rgb(231, 93, 93);">reject</span> have the same syntax. Resolve leads to the next .then in the chain while reject leads to the next .catch.</li>
+							  <li class="fragment fade-in">When anything in the chain of promises fails and raises an error or rejects the promise, the control goes to the nearest catch() statement down the chain.</li>
+							</ul>
+					</section>
+					<section>
+						<h2>Cascading Errors</h2>
+						<p>If inside the catch() you raise an error, you can append a second catch() to handle it, and so on.</p>
+						<pre><code data-trim data-noescape>
+								new Promise((resolve, reject) => {
+									throw new Error('Error')
+								  })
+									.catch((err) => { throw new Error('Error') })
+									.catch((err) => { console.error(err) })
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+							<h2>Arrow Functions</h2>
+							<p>If you’re very tired of typing and reading code you can use arrow functions.</p>
+							<pre class="fragment fade-in" data-fragment-index="0"><code data-trim data-noescape>
+								.then((argument) => {
+									return nextFunction(argument, etc);
+								})
+							</code></pre>
+							<div class="fragment fade-in" data-fragment-index="1">
+							<p>Or even like this:</p>
+							<pre><code data-trim data-noescape class="javascript">
+								.then(argument => nextFunction(argument, etc));
+							</code></pre>
+							</div>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>JS Promises support </h2>
+						<img src="./img/browser.png" alt="browser compatibility">
+						<aside class="notes">JavaScript Promises are part of the ECMAscript 6 standards and should be supported by all browsers eventually.
+						At the moment that promise is already realized in recent versions of Chrome, FF, Safari, and on mobile browsers with the exception of IE.</aside>
+					</section>
+				</section>
+				<section>
+					<h1>Conclusion</h1>
+					<aside class="notes">Promises are going to become the standard approach for dealing with large amounts of asynchronous operations. However, I’ve found them to generally
+						offer a lot of benefits when working on complex sequences of operations where some are sync, and others async. If you have not tried them yet I’d really recommend it on your next project.</aside>
+				</section>
+				<!-- <section>
+					<h2>Useful links:</h2>
+					<ul>
+						<li><a href="https://flaviocopes.com/javascript-promises/">flaviocopes.com</a></li>
+						<li><a href="https://javascriptplayground.com/promises/">javascriptplayground.com</a></li>
+						<li><a href="https://developers.google.com/web/fundamentals/primers/promises#constructor">Google fundamentals</a></li>
+						<li><a href="https://javascript.info/promise-basics">javascript.info</a></li>
+					</ul>
+				</section> -->
+				<section data-background="#ca5638">
+					<img src="https://media.giphy.com/media/9Gp5ZwY8FRvna/giphy.gif" style="width: 100%; height: 100%; border: none; box-shadow: none;">
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
